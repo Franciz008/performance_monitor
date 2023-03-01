@@ -119,7 +119,7 @@ def monitor_info_record_to_file():
             asyncio.run(monitor_info.main())
             line = (m_date.time(), monitor_info.cpu_rate, monitor_info.memory_used, monitor_info.disk_read,
                     monitor_info.disk_write,
-                    monitor_info.net_recv, monitor_info.net_sent)
+                    monitor_info.net_sent, monitor_info.net_recv)
             print(*line)
             writer.writerow(line)
 
