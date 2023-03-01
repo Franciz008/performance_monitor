@@ -10,7 +10,7 @@ pyinstaller -n system_monitor -F -i "C:\Users\Franciz\Pictures\我的照片\perf
 
 linux打包
 ```shell
-pyinstaller -n system_monitor -F system_monitor.py
+pyinstaller -n linux_system_monitor -F system_monitor.py
 ```
 
 # 使用说明
@@ -47,11 +47,11 @@ cpu百分比:所有的cpu的平均利用率,此处和windows的任务管理器�
 
 ## 支持Linux
 
-![image-20230228160204237](README.assets/image-20230228160204237.png)	
+![image-20230301111624015](README.assets/image-20230301111624015.png)	
 
 使用方法
 
 ```shell
-./system_monitor
+./linux_system_monitor
 ```
 
