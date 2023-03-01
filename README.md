@@ -3,8 +3,14 @@
 
 可以监控['cpu百分比', '已用内存/MB', '磁盘读取MB/s', '磁盘写入MB/s', '网络上传MB/s', '网络下载MB/s']
 
+windows打包
 ```bash
 pyinstaller -n system_monitor -F -i "C:\Users\Franciz\Pictures\我的照片\performance_monitor.ico" .\system_monitor.py --distpath=E:\WORK\测试升级工具
+```
+
+linux打包
+```shell
+pyinstaller -n system_monitor -F system_monitor.py
 ```
 
 # 使用说明
