@@ -1,7 +1,7 @@
 # performance_monitor
-psutil based performance testing tool for windows and linux
+基于psutil开发的Windows和Linux性能测试工具
 
-Can monitor [' CPU percentage ', 'has been in memory/MB', 'read disk MB/s',' the disk write MB/s', 'network upload MB/s',' Internet downloads MB/s]
+可以监控['cpu百分比', '已用内存/MB', '磁盘读取MB/s', '磁盘写入MB/s', '网络上传MB/s', '网络下载MB/s']
 
 ```bash
 pyinstaller -n system_monitor -F -i "C:\Users\Franciz\Pictures\我的照片\performance_monitor.ico" .\system_monitor.py --distpath=E:\WORK\测试升级工具
