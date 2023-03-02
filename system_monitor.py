@@ -124,17 +124,17 @@ def monitor_info_record_to_file():
             writer.writerow(line)
 
 
-def get_pid(name):
-    """
-
-    :param name:
-    :return: 根据完整的程序名称获取程序的pid
-    """
-    pids = psutil.process_iter()
-    for pid in pids:
-        if pid.name() == name:
-            print(f"[{name}]'s pid is:{pid.pid}")
-            return pid.pid
+def get_pids(name):
+    procs = list()
+    # Iterate over the all the running process
+    for proc in psutil.process_iter():
+        try:
+            if name in proc.name() and proc.status() == psutil.STATUS_RUNNING:
+                pid = proc.pid
+                procs.append(pid)
+        except:
+            pass
+    return procs
 
 
 if __name__ == "__main__":
@@ -143,7 +143,13 @@ if __name__ == "__main__":
     # for i in range(20):
     #     print(asyncio.run(MonitorInfo().get_disk_io()))
 
-    # p = psutil.Process(get_pid('pycharm64.exe'))
+    # 杀死进程
+    # for i in get_pids('Apifox.exe'):
+    #     p = psutil.Process(i)
+    #     p.terminate()
+    #     p.kill()
+    #     p.parent().kill()
+
     # print(p.memory_info().rss / 1024 / 1024, 'MB')
     # # memory_full_info()
     # # 此方法返回与memory_info（）相同的信息，同时，在某些平台（Linux，macOS，Windows）上，该方法还提供其他指标（USS，PSS和swap）。
