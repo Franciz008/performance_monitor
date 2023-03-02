@@ -69,8 +69,8 @@ class MonitorInfo:
         # 单位mb
         total_read = round(total_read / 1024 / 1024, 2)
         total_write = round(total_write / 1024 / 1024, 2)
-        self.disk_read = total_read
-        self.disk_write = total_write
+        self.disk_read = 0 if total_read < 0 else total_read
+        self.disk_write = 0 if total_write < 0 else total_write
         # 读取,写入 MB/s
         return total_read, total_write
 
@@ -89,8 +89,8 @@ class MonitorInfo:
         total_sent = (bytes_sent1 - bytes_sent) / time_diff
         total_recv = round(total_recv / 1024 / 1024, 2)
         total_sent = round(total_sent / 1024 / 1024, 2)
-        self.net_recv = total_recv
-        self.net_sent = total_sent
+        self.net_recv = 0 if total_recv < 0 else total_recv
+        self.net_sent = 0 if total_sent < 0 else total_sent
         # 发送/接收 MB/s
         return total_sent, total_recv
 
