@@ -12,4 +12,6 @@ def create_csv(header: list, file_name):
             writer = csv.writer(file_obj)
             writer.writerow(header)
         print(f'创建文件:{file_name}')
+    else:
+        print(f'文件:{file_name}已存在')
     return file_name

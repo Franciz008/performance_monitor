@@ -127,13 +127,17 @@ def monitor_info_record_to_file(wait_time):
             writer.writerow(line)
 
 
-if __name__ == "__main__":
+def argument_parser():
     parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程/记录系统性能信息(默认)")
     parser.add_argument('-p', '--process', help='软件名称')
     parser.add_argument('-it', '--interval_time', help='间隔时间', type=int, default=10)
     parser.add_argument('-fp', '--file_period', help='记录周期', type=int, default=7)
     parser.add_argument('-s', '--system', help='记录系统性能信息', action='store_true', default=True)
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = argument_parser()
     # print(args)
     if args.process:
         process_monitor_info_record_to_file(args.process, args.file_period, args.interval_time)
