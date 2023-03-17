@@ -155,7 +155,7 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2, de
     header = handle_detail(detail, header)
     file_name = get_csv_name(raw_file_time, pr_name)
     create_csv(header, file_name)
-    write_record = [2] * 1
+    write_record = [2] * 1  # 记录写入的状态,用来判断是否写入
     while True:
         if file_period is not None:
             file_name, raw_file_time = create_next_date_csv(file_name, file_period, header, pr_name, raw_file_time)
