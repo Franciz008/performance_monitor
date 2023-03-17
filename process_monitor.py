@@ -134,15 +134,17 @@ def create_next_date_csv(file_name, file_period: int, header, pr_name, raw_file_
     return file_name, raw_file_time
 
 
-def process_monitor_info_record_to_file(file_period=1, wait_time=2):
+def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2):
     """
 
+    :param prc_name: 软件名称,示例:java.exe
     :param wait_time: 间隔时间/秒
     :param file_period:  件创建周期/天
     :return:
     """
     raw_file_time = m_date.date()
-    pr_name = 'java.exe'
+    pr_name = prc_name
+    print(f'监控的软件名称:{pr_name}')
     header = ['时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '状态']
     file_name = get_csv_name(raw_file_time, pr_name)
     create_csv(header, file_name)

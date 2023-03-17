@@ -6,7 +6,7 @@ block_cipher = None
 
 a = Analysis(
     ['system_monitor.py'],
-    pathex=[],
+    pathex=['.\\common.py', '.\\process_monitor.py'],
     binaries=[],
     datas=[],
     hiddenimports=[],

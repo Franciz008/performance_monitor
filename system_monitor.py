@@ -4,10 +4,12 @@ import os
 import sys
 import time
 
+import argparse
 import psutil
 from x_mock.m_random import m_date
 
 from common import create_csv
+from process_monitor import process_monitor_info_record_to_file
 
 
 # @author Franciz
@@ -126,4 +128,10 @@ def monitor_info_record_to_file():
 
 
 if __name__ == "__main__":
-    monitor_info_record_to_file()
+    parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程")
+    parser.add_argument('-p', '--process', type=str, help='软件名称')
+    args = parser.parse_args()
+    if args.process:
+        process_monitor_info_record_to_file(args.process)
+    else:
+        monitor_info_record_to_file()
