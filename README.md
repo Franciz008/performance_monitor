@@ -4,17 +4,7 @@
 
 可以监控['cpu百分比', '已用内存/MB', '磁盘读取MB/s', '磁盘写入MB/s', '网络上传MB/s', '网络下载MB/s']
 
-windows打包
-
-```bash
-pyinstaller -n system_monitor -F -i "C:\Users\Franciz\Pictures\我的照片\performance_monitor.ico" .\system_monitor.py -p .\common.py -p .\process_monitor.py --distpath=E:\WORK\测试升级工具
-
-linux打包
-```shell
-pyinstaller -n linux_system_monitor -F system_monitor.py
-```
-
-# 简介
+## 简介
 
 软件资源占用非常小几乎可以忽略不计,记录的数据是实时写入的--即使关闭了程序,历史记录也存在.
 
@@ -22,6 +12,16 @@ pyinstaller -n linux_system_monitor -F system_monitor.py
 
 可以使用命令行传参,查看帮助 -h
 ![img.png](README.assets/img.png)
+
+## 参数列表
+
+| 命令 | 释义                              |
+| ---- | --------------------------------- |
+| -p   | 软件的名称                        |
+| -s   | 启动监控系统性能,不可与-p同时使用 |
+| -it  | 记录的间隔时间/秒                 |
+| -fp  | 记录的文件写入周期/天             |
+| -d   | 是否记录所有进程的名字            |
 
 ## windows系统中监控系统性能
 
@@ -53,7 +53,7 @@ cpu百分比:所有的cpu的平均利用率,此处和windows的任务管理器�
 system_monitor.exe -p java.exe
 ```
 
-![img_1.png](README.assets/img_1.png)
+![	](README.assets/img_1.png)
 
 设置文件写入周期7天/次,监控周期60秒/次
 

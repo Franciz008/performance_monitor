@@ -130,7 +130,7 @@ def monitor_info_record_to_file(wait_time):
 def argument_parser():
     parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程(含子进程)/记录系统性能信息(默认)")
     parser.add_argument('-p', '--process', help='软件名称')
-    parser.add_argument('-s', '--system', help='记录系统性能信息', action='store_true', default=True)
+    parser.add_argument('-s', '--system', help='记录系统性能信息,不可与-p同时使用', action='store_true', default=True)
     parser.add_argument('-it', '--interval_time', help='间隔时间', type=int, default=10)
     parser.add_argument('-fp', '--file_period', help='记录周期', type=int, default=7)
     parser.add_argument('-d', '--detail', help='记录进程列表到csv', action='store_false', default=False)
