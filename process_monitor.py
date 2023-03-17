@@ -121,7 +121,7 @@ def create_next_date_csv(file_name, file_period: int, header, pr_name, raw_file_
     :param file_period: 创建文件的周期/天
     :param header: 创建文件的表头
     :param pr_name: 监控的程序名称
-    :param raw_file_time: 原始的文件名称的日期,用于
+    :param raw_file_time: 原始的文件名称的日期,用于比对是否生成新文件
     :return: 创建新的日期的文件,返回修改后的[新文件名称,新的文件名的日期]
     """
     old_date = datetime.strptime(raw_file_time, '%Y-%m-%d')
