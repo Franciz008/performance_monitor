@@ -18,7 +18,8 @@ class ProcessMonitorInfo:
     used_memory_percent = 0  # 已用内存百分比/MB
     used_memory = 0  # 已用内存/MB
     status = 0
-    process_size = None
+    process_size = 0
+    proc_names = []  # 进程名称的列表
 
     def __init__(self, name, path=None, interval_time=2):
         self.name = name
@@ -35,9 +36,14 @@ class ProcessMonitorInfo:
         procs = []
         for proc in psutil.process_iter():
             if name in proc.name() and proc.status() == psutil.STATUS_RUNNING:
-                # 获取名称对应且是运行中的改程序的所有子进程,若有此程序的进程名不一致的,可能会有偏差
+                # 获取名称对应且是运行中的改程序的所有进程(含子进程)
                 # pid = proc.pid
                 procs.append(proc)
+                children_pids = proc.children()
+                if len(children_pids) > 0:
+                    for i in proc.children():
+                        procs.append(i)
+        self.proc_names = [i.name() for i in procs]
         return procs
 
     async def get_used_memory(self):
@@ -87,13 +93,12 @@ class ProcessMonitorInfo:
             pros = self.get_pids()
             await asyncio.gather(self.get_used_memory(), self.get_used_memory_percent(),
                                  self.get_cpu_percent())
-            return [self.cpu_percent, self.used_memory, self.used_memory_percent, self.status]
             # print('总内存', self.used_memory)
             # print('总内存占比', self.used_memory_percent)
             # print('总CPU占比', self.cpu_percent)
         else:
             self.status = 0
-            return [self.cpu_percent, self.used_memory, self.used_memory_percent, self.status]
+        return [self.cpu_percent, self.used_memory, self.used_memory_percent, self.process_size, self.status]
 
     def kill(self):
         pass
@@ -145,7 +150,7 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2):
     raw_file_time = m_date.date()
     pr_name = prc_name
     print(f'监控的软件名称:{pr_name},记录文件创建周期:{file_period}天/次,间隔时间:{wait_time}秒/次')
-    header = ['日期', '时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '状态']
+    header = ['日期', '时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '进程数', '状态', '进程列表']
     file_name = get_csv_name(raw_file_time, pr_name)
     create_csv(header, file_name)
     while True:
@@ -154,7 +159,7 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2):
         with open(file_name, 'a+', encoding='utf-8', newline='') as file_obj:
             # 1:创建writer对象
             writer = csv.writer(file_obj)
-            process_monitor_info = ProcessMonitorInfo(pr_name, wait_time)
+            process_monitor_info = ProcessMonitorInfo(name=pr_name, interval_time=wait_time)
             try:
                 result = asyncio.run(process_monitor_info.get_monitor_info())
             except:
@@ -162,8 +167,8 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2):
             finally:
                 if process_monitor_info.status == 0:
                     time.sleep(process_monitor_info.interval_time)
-            line = (m_date.date(), m_date.time(), *result)
-            print(*line)
+            line = (m_date.date(), m_date.time(), *result, process_monitor_info.proc_names)
+            print(*line[:-1])
             writer.writerow(line)
 
 # if __name__ == "__main__":

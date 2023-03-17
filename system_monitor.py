@@ -128,7 +128,7 @@ def monitor_info_record_to_file(wait_time):
 
 
 def argument_parser():
-    parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程/记录系统性能信息(默认)")
+    parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程(含子进程)/记录系统性能信息(默认)")
     parser.add_argument('-p', '--process', help='软件名称')
     parser.add_argument('-it', '--interval_time', help='间隔时间', type=int, default=10)
     parser.add_argument('-fp', '--file_period', help='记录周期', type=int, default=7)
@@ -138,7 +138,9 @@ def argument_parser():
 
 if __name__ == "__main__":
     args = argument_parser()
-    # print(args)
+    # print(args)  # 调试
+    # args.process = 'pycharm64.exe'
+    # args.interval_time = 2
     if args.process:
         process_monitor_info_record_to_file(args.process, args.file_period, args.interval_time)
     elif args.system:
