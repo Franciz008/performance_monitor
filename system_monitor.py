@@ -140,8 +140,8 @@ def argument_parser():
 if __name__ == "__main__":
     args = argument_parser()
     # print(args)  # 调试
-    args.process = 'Apifox.exe'
-    args.interval_time = 2
+    # args.process = 'Apifox.exe'
+    # args.interval_time = 2
     if args.process:
         process_monitor_info_record_to_file(args.process, args.file_period, args.interval_time, args.detail)
     elif args.system:
