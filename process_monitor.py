@@ -139,9 +139,10 @@ def create_next_date_csv(file_name, file_period: int, header, pr_name, raw_file_
     return file_name, raw_file_time
 
 
-def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2):
+def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2, detail=False):
     """
 
+    :param detail: 详细信息
     :param prc_name: 软件名称,示例:java.exe
     :param wait_time: 间隔时间/秒
     :param file_period:  记录文件创建周期/天
@@ -150,7 +151,8 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2):
     raw_file_time = m_date.date()
     pr_name = prc_name
     print(f'监控的软件名称:{pr_name},记录文件创建周期:{file_period}天/次,间隔时间:{wait_time}秒/次')
-    header = ['日期', '时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '进程数', '状态', '进程列表']
+    header = ['日期', '时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '进程数/个', '状态(1活)', '进程列表']
+    header = handle_detail(detail, header)
     file_name = get_csv_name(raw_file_time, pr_name)
     create_csv(header, file_name)
     while True:
@@ -169,7 +171,12 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2):
                     time.sleep(process_monitor_info.interval_time)
             line = (m_date.date(), m_date.time(), *result, process_monitor_info.proc_names)
             print(*line[:-1])
+            line = handle_detail(detail, line)
             writer.writerow(line)
 
-# if __name__ == "__main__":
-#     process_monitor_info_record_to_file()
+
+def handle_detail(detail, line):
+    if detail is False:
+        # 不展示细节则删除进程列表
+        line = line[:-1]
+    return line
