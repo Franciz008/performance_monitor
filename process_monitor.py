@@ -155,6 +155,7 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2, de
     header = handle_detail(detail, header)
     file_name = get_csv_name(raw_file_time, pr_name)
     create_csv(header, file_name)
+    write_record = [2] * 1
     while True:
         if file_period is not None:
             file_name, raw_file_time = create_next_date_csv(file_name, file_period, header, pr_name, raw_file_time)
@@ -172,7 +173,10 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2, de
             line = (m_date.date(), m_date.time(), *result, process_monitor_info.proc_names)
             print(*line[:-1])
             line = handle_detail(detail, line)
-            writer.writerow(line)
+            write_record = write_record[-2:]
+            if process_monitor_info.status != write_record[-1]:
+                writer.writerow(line)
+            write_record.append(process_monitor_info.status)
 
 
 def handle_detail(detail, line):
