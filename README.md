@@ -8,7 +8,7 @@
 
 软件资源占用非常小几乎可以忽略不计,记录的数据是实时写入的--即使关闭了程序,历史记录也存在.
 
-启动软件默认10s记录并写入一次`当前系统日期MonitorInfo.csv` 文件存在于软件所在目录
+启动软件默认10s记录`系统性能`并写入一次`当前系统日期MonitorInfo.csv` 文件存在于软件所在目录
 
 可以使用命令行传参,查看帮助 -h
 ![img.png](README.assets/img.png)
@@ -53,7 +53,7 @@ cpu百分比:所有的cpu的平均利用率,此处和windows的任务管理器�
 system_monitor.exe -p java.exe
 ```
 
-![	](README.assets/img_1.png)
+![	](README.assets/img_1.png)	
 
 设置文件写入周期7天/次,监控周期60秒/次
 
@@ -80,4 +80,10 @@ system_monitor.exe -p java.exe -it 60 -fp 7
 ```shell
 ./linux_system_monitor
 ```
+
+## 使用技巧
+
+因为支持命令行传参所以你可以自用的使用shell脚本或者bat脚本来完成指定的场景.
+
+例如: windows下`start system_monitor.exe -p AutoSys.exe`
 
