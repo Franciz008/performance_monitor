@@ -107,7 +107,7 @@ class SystemMonitorInfo:
 
 
 def monitor_info_record_to_file(wait_time):
-    print(f'性能监控记录:{wait_time}秒/次')
+    print(f'开始系统性能监控,监控记录:{wait_time}秒/次')
     # 准备写文件
     header = ['时间', 'cpu百分比/s', '已用内存/MB', '磁盘读取MB/s', '磁盘写入MB/s', '网络上传MB/s',
               '网络下载MB/s']
@@ -128,11 +128,11 @@ def monitor_info_record_to_file(wait_time):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程/记录系统性能信息")
+    parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程/记录系统性能信息(默认)")
     parser.add_argument('-p', '--process', help='软件名称')
     parser.add_argument('-it', '--interval_time', help='间隔时间', type=int, default=10)
     parser.add_argument('-fp', '--file_period', help='记录周期', type=int, default=7)
-    parser.add_argument('-s', '--system', help='记录系统性能信息', action='store_true')
+    parser.add_argument('-s', '--system', help='记录系统性能信息', action='store_true', default=True)
     args = parser.parse_args()
     # print(args)
     if args.process:
