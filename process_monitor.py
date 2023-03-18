@@ -151,7 +151,8 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2, de
     raw_file_time = m_date.date()
     pr_name = prc_name
     print(f'监控的软件名称:{pr_name},记录文件创建周期:{file_period}天/次,间隔时间:{wait_time}秒/次')
-    header = ['日期', '时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '进程数/个', '状态(1活)', '进程列表']
+    header = ['日期', '时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '进程数/个', '状态(1存活/0死亡)',
+              '进程列表']
     header = handle_detail(detail, header)
     file_name = get_csv_name(raw_file_time, pr_name)
     create_csv(header, file_name)
