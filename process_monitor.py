@@ -45,7 +45,7 @@ class ProcessMonitorInfo:
         for proc in self.process_list:
             memory = proc.memory_full_info().uss
             memory_list.append(round(memory / 1024 / 1024, 2))
-        self.used_memory = sum(memory_list)
+        self.used_memory = float('%.2f' % sum(memory_list))
         return self.used_memory
 
     async def get_used_memory_percent(self):
@@ -53,7 +53,7 @@ class ProcessMonitorInfo:
         for proc in self.process_list:
             memory_percent = proc.memory_percent()
             memory_percent_list.append(memory_percent)
-        self.used_memory_percent = round(sum(memory_percent_list), 2)
+        self.used_memory_percent = float('%.2f' % sum(memory_percent_list))
         return self.used_memory_percent
 
     async def get_cpu_percent(self):
@@ -69,7 +69,7 @@ class ProcessMonitorInfo:
             results = pool.map(__cpu_percent, self.process_list)
             for r in results:
                 cpu_percent_list.append(r)
-        self.cpu_percent = round(sum(cpu_percent_list), 2)
+        self.cpu_percent = float('%.2f' % sum(cpu_percent_list))
         return
 
     async def get_io_counters(self):
@@ -139,13 +139,13 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2):
 
     :param prc_name: 软件名称,示例:java.exe
     :param wait_time: 间隔时间/秒
-    :param file_period:  件创建周期/天
+    :param file_period:  记录文件创建周期/天
     :return:
     """
     raw_file_time = m_date.date()
     pr_name = prc_name
-    print(f'监控的软件名称:{pr_name}')
-    header = ['时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '状态']
+    print(f'监控的软件名称:{pr_name},记录文件创建周期/天:{file_period},间隔时间:{wait_time}秒/次')
+    header = ['日期', '时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '状态']
     file_name = get_csv_name(raw_file_time, pr_name)
     create_csv(header, file_name)
     while True:
@@ -162,7 +162,7 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2):
             finally:
                 if process_monitor_info.status == 0:
                     time.sleep(process_monitor_info.interval_time)
-            line = (m_date.time(), *result)
+            line = (m_date.date(), m_date.time(), *result)
             print(*line)
             writer.writerow(line)
 

@@ -106,12 +106,11 @@ class SystemMonitorInfo:
                                     self.get_system_cpu_rate())
 
 
-def monitor_info_record_to_file():
-    # 性能监控的间隔时间
-    wait_time = int(sys.argv[1]) if len(sys.argv) > 1 else 10
+def monitor_info_record_to_file(wait_time):
     print(f'性能监控记录:{wait_time}秒/次')
     # 准备写文件
-    header = ['时间', 'cpu百分比/s', '已用内存/MB', '磁盘读取MB/s', '磁盘写入MB/s', '网络上传MB/s', '网络下载MB/s']
+    header = ['时间', 'cpu百分比/s', '已用内存/MB', '磁盘读取MB/s', '磁盘写入MB/s', '网络上传MB/s',
+              '网络下载MB/s']
     file_name = f'{m_date.date()}_{"MonitorInfo"}.csv'
     create_csv(header, file_name)
     while True:
@@ -120,18 +119,23 @@ def monitor_info_record_to_file():
             writer = csv.writer(file_obj)
             monitor_info = SystemMonitorInfo(wait_time)
             asyncio.run(monitor_info.main())
-            line = (m_date.time(), monitor_info.cpu_rate, monitor_info.memory_used, monitor_info.disk_read,
-                    monitor_info.disk_write,
-                    monitor_info.net_sent, monitor_info.net_recv)
+            line = (
+                m_date.time(), monitor_info.cpu_rate, monitor_info.memory_used, monitor_info.disk_read,
+                monitor_info.disk_write,
+                monitor_info.net_sent, monitor_info.net_recv)
             print(*line)
             writer.writerow(line)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程")
-    parser.add_argument('-p', '--process', type=str, help='软件名称')
+    parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程/记录系统性能信息")
+    parser.add_argument('-p', '--process', help='软件名称')
+    parser.add_argument('-it', '--interval_time', help='间隔时间', type=int, default=10)
+    parser.add_argument('-fp', '--file_period', help='记录周期', type=int, default=7)
+    parser.add_argument('-s', '--system', help='记录系统性能信息', action='store_true')
     args = parser.parse_args()
+    # print(args)
     if args.process:
-        process_monitor_info_record_to_file(args.process)
-    else:
-        monitor_info_record_to_file()
+        process_monitor_info_record_to_file(args.process, args.file_period, args.interval_time)
+    elif args.system:
+        monitor_info_record_to_file(args.interval_time)
