@@ -4,13 +4,11 @@ import asyncio
 import csv
 import time
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
 
 import psutil
-from dateutil.relativedelta import relativedelta
 from x_mock.m_random import m_date
 
-from common import create_csv
+from common import create_csv, create_next_date_csv, get_csv_name
 
 
 class ProcessMonitorInfo:
@@ -112,31 +110,6 @@ class ProcessMonitorInfo:
         # # pss： 该进程实际使用物理内存（比例分配共享库占用内存）
         # # uss：进程独立占用的物理内存（不包含共享库占用的内存）
         # print(p.memory_full_info().uss / 1024 / 1024, 'MB')
-
-
-def get_csv_name(file_time, pr_name):
-    file_name = f'{file_time}_{pr_name}{"_ProcessMonitorInfo"}.csv'
-    return file_name
-
-
-def create_next_date_csv(file_name, file_period: int, header, pr_name, raw_file_time):
-    """
-
-    :param file_name: 原始文件的名称
-    :param file_period: 创建文件的周期/天
-    :param header: 创建文件的表头
-    :param pr_name: 监控的程序名称
-    :param raw_file_time: 原始的文件名称的日期,用于比对是否生成新文件
-    :return: 创建新的日期的文件,返回修改后的[新文件名称,新的文件名的日期]
-    """
-    old_date = datetime.strptime(raw_file_time, '%Y-%m-%d')
-    new_date = old_date + relativedelta(days=file_period)
-    now_date = datetime.strptime(m_date.date(), '%Y-%m-%d')
-    if now_date >= new_date:
-        raw_file_time = now_date.strftime('%Y-%m-%d')
-        file_name = get_csv_name(raw_file_time, pr_name)
-        create_csv(header, file_name)
-    return file_name, raw_file_time
 
 
 def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2, detail=False):

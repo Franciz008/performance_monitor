@@ -8,8 +8,8 @@ import argparse
 import psutil
 from x_mock.m_random import m_date
 
-from common import create_csv
-from process_monitor import process_monitor_info_record_to_file
+from common import create_csv, create_next_date_csv
+from process_monitor import process_monitor_info_record_to_file, get_csv_name
 
 
 # @author Franciz
@@ -101,28 +101,29 @@ class SystemMonitorInfo:
         return total_sent, total_recv
 
     async def main(self):
-        return await asyncio.gather(self.get_system_network_io(), self.get_system_disk_io(),
-                                    self.get_system_memory_rate(),
-                                    self.get_system_cpu_rate())
+        await asyncio.gather(self.get_system_cpu_rate(), self.get_system_memory_rate(),
+                             self.get_system_disk_io(),
+                             self.get_system_network_io())
+        return [self.cpu_rate, self.memory_used, self.disk_read, self.disk_write, self.net_sent, self.net_recv]
 
 
-def monitor_info_record_to_file(wait_time):
-    print(f'开始系统性能监控,监控记录:{wait_time}秒/次')
+def monitor_info_record_to_file(file_period=1, wait_time=10):
+    raw_file_time = m_date.date()
+    print(f'开始系统性能监控,记录文件创建周期:{file_period}天/次,监控记录:{wait_time}秒/次')
     # 准备写文件
-    header = ['时间', 'cpu百分比/s', '已用内存/MB', '磁盘读取MB/s', '磁盘写入MB/s', '网络上传MB/s',
+    header = ['日期', '时间', 'cpu百分比/s', '已用内存/MB', '磁盘读取MB/s', '磁盘写入MB/s', '网络上传MB/s',
               '网络下载MB/s']
-    file_name = f'{m_date.date()}_{"MonitorInfo"}.csv'
+    file_name = get_csv_name(raw_file_time)
     create_csv(header, file_name)
     while True:
+        if file_period is not None:
+            file_name, raw_file_time = create_next_date_csv(file_name, file_period, header, None, raw_file_time)
         with open(file_name, 'a+', encoding='utf-8', newline='') as file_obj:
             # 1:创建writer对象
             writer = csv.writer(file_obj)
             monitor_info = SystemMonitorInfo(wait_time)
-            asyncio.run(monitor_info.main())
-            line = (
-                m_date.time(), monitor_info.cpu_rate, monitor_info.memory_used, monitor_info.disk_read,
-                monitor_info.disk_write,
-                monitor_info.net_sent, monitor_info.net_recv)
+            result = asyncio.run(monitor_info.main())
+            line = (m_date.date(), m_date.time(), *result)
             print(*line)
             writer.writerow(line)
 
@@ -145,4 +146,4 @@ if __name__ == "__main__":
     if args.process:
         process_monitor_info_record_to_file(args.process, args.file_period, args.interval_time, args.detail)
     elif args.system:
-        monitor_info_record_to_file(args.interval_time)
+        monitor_info_record_to_file(args.file_period, args.interval_time)
