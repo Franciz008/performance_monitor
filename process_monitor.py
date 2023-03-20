@@ -33,7 +33,7 @@ class ProcessMonitorInfo:
         name = self.name
         procs = []
         for proc in psutil.process_iter():
-            if name in proc.name() and proc.status() == psutil.STATUS_RUNNING:
+            if name in proc.name() and proc.status() in (psutil.STATUS_RUNNING, psutil.STATUS_SLEEPING):
                 # 获取名称对应且是运行中的改程序的所有进程(含子进程)
                 # pid = proc.pid
                 procs.append(proc)
