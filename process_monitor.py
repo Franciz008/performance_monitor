@@ -25,6 +25,9 @@ class ProcessMonitorInfo:
         self.interval_time = interval_time
         self.process_list = self.get_pids()
 
+    def get_all_info(self):
+        return [self.cpu_percent, self.used_memory, self.used_memory_percent, self.process_size, self.status]
+
     def get_pids(self):
         """
 
@@ -58,6 +61,10 @@ class ProcessMonitorInfo:
         return procs
 
     async def get_used_memory(self):
+        """
+
+        :return: 已用内存
+        """
         memory_list = []
         for proc in self.process_list:
             memory = proc.memory_full_info().uss
@@ -66,6 +73,10 @@ class ProcessMonitorInfo:
         return self.used_memory
 
     async def get_used_memory_percent(self):
+        """
+
+        :return: 已用内存百分比
+        """
         memory_percent_list = []
         for proc in self.process_list:
             memory_percent = proc.memory_percent()
@@ -74,6 +85,10 @@ class ProcessMonitorInfo:
         return self.used_memory_percent
 
     async def get_cpu_percent(self):
+        """
+
+        :return: cpu的使用频率
+        """
         cpu_percent_list = []
 
         def __cpu_percent(process):
@@ -104,12 +119,9 @@ class ProcessMonitorInfo:
             pros = self.get_pids()
             await asyncio.gather(self.get_used_memory(), self.get_used_memory_percent(),
                                  self.get_cpu_percent())
-            # print('总内存', self.used_memory)
-            # print('总内存占比', self.used_memory_percent)
-            # print('总CPU占比', self.cpu_percent)
         else:
             self.status = 0
-        return [self.cpu_percent, self.used_memory, self.used_memory_percent, self.process_size, self.status]
+        return self.get_all_info()
 
     def kill(self):
         pass
@@ -153,7 +165,7 @@ def process_monitor_info_record_to_file(process_name, process_port=None, file_pe
             try:
                 result = asyncio.run(process_monitor_info.get_monitor_info())
             except:
-                pass
+                result = process_monitor_info.get_all_info()
             finally:
                 if process_monitor_info.status == 0:
                     time.sleep(process_monitor_info.interval_time)

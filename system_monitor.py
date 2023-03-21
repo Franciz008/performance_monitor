@@ -50,6 +50,10 @@ class SystemMonitorInfo:
         return cpu
 
     async def get_system_disk_io(self):
+        """
+
+        :return: 系统磁盘io
+        """
         disk_io_counter = psutil.disk_io_counters()
         start_time = time.perf_counter()
         disk_read_bytes = disk_io_counter.read_bytes
@@ -81,6 +85,10 @@ class SystemMonitorInfo:
         return total_read, total_write
 
     async def get_system_network_io(self):
+        """
+
+        :return: 系统网络io
+        """
         net_io_counter = psutil.net_io_counters()
         bytes_recv = net_io_counter.bytes_recv
         bytes_sent = net_io_counter.bytes_sent
