@@ -19,9 +19,9 @@ class ProcessMonitorInfo:
     process_size = 0
     proc_names = []  # 进程名称的列表
 
-    def __init__(self, name, path=None, interval_time=2):
+    def __init__(self, name, port=None, interval_time=2):
         self.name = name
-        self.path = path
+        self.port = port
         self.interval_time = interval_time
         self.process_list = self.get_pids()
 
@@ -30,17 +30,30 @@ class ProcessMonitorInfo:
 
         :return: 根据程序的名称如:Thunder.exe 返回对应程序活动的进程列表
         """
+
+        def add():
+            procs.append(proc)
+            children_pids = proc.children()
+            if len(children_pids) > 0:
+                for i in proc.children():
+                    procs.append(i)
+
         name = self.name
         procs = []
         for proc in psutil.process_iter():
             if name in proc.name() and proc.status() in (psutil.STATUS_RUNNING, psutil.STATUS_SLEEPING):
                 # 获取名称对应且是运行中的改程序的所有进程(含子进程)
                 # pid = proc.pid
-                procs.append(proc)
-                children_pids = proc.children()
-                if len(children_pids) > 0:
-                    for i in proc.children():
-                        procs.append(i)
+                # cmdline = proc.as_dict().get('cmdline')
+                # print(json.dumps(proc.as_dict(), indent=2))
+                proc_environ = proc.as_dict().get('environ')
+                proc_port = None if proc_environ is None else proc_environ.get('PORT')
+                if self.port is not None and proc_port and self.port == proc_port:
+                    # 根据名称和端口号确定监控的进程
+                    add()
+                elif self.port is None:
+                    # 根据名称确定监控的进程
+                    add()
         self.proc_names = [i.name() for i in procs]
         return procs
 
@@ -112,18 +125,19 @@ class ProcessMonitorInfo:
         # print(p.memory_full_info().uss / 1024 / 1024, 'MB')
 
 
-def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2, detail=False):
+def process_monitor_info_record_to_file(process_name, process_port=None, file_period=1, wait_time=2, detail=False):
     """
 
+    :param process_port: 进程的端口
     :param detail: 详细信息
-    :param prc_name: 软件名称,示例:java.exe
+    :param process_name: 软件名称,示例:java.exe
     :param wait_time: 间隔时间/秒
     :param file_period:  记录文件创建周期/天
     :return:
     """
     raw_file_time = m_date.date()
-    pr_name = prc_name
-    print(f'监控的软件名称:{pr_name},记录文件创建周期:{file_period}天/次,间隔时间:{wait_time}秒/次')
+    pr_name = process_name
+    print(f'监控的软件名称:{pr_name},端口:{process_port},记录文件创建周期:{file_period}天/次,间隔时间:{wait_time}秒/次')
     header = ['日期', '时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '进程数/个', '状态(1存活/0死亡)',
               '进程列表']
     header = handle_detail(detail, header)
@@ -135,7 +149,7 @@ def process_monitor_info_record_to_file(prc_name, file_period=1, wait_time=2, de
         with open(file_name, 'a+', encoding='utf-8', newline='') as file_obj:
             # 1:创建writer对象
             writer = csv.writer(file_obj)
-            process_monitor_info = ProcessMonitorInfo(name=pr_name, interval_time=wait_time)
+            process_monitor_info = ProcessMonitorInfo(name=pr_name, port=process_port, interval_time=wait_time)
             try:
                 result = asyncio.run(process_monitor_info.get_monitor_info())
             except:

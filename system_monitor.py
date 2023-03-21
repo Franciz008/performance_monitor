@@ -130,8 +130,11 @@ def monitor_info_record_to_file(file_period=1, wait_time=10):
 
 def argument_parser():
     parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程(含子进程)/记录系统性能信息(默认)")
-    parser.add_argument('-p', '--process', help='软件名称')
+    # 系统监控
     parser.add_argument('-s', '--system', help='记录系统性能信息,不可与-p同时使用', action='store_true', default=True)
+    # 进程相关
+    parser.add_argument('-p', '--process', help='软件名称')
+    parser.add_argument('-port', help='软件对应的端口号', type=str, default=None)
     parser.add_argument('-it', '--interval_time', help='间隔时间', type=int, default=10)
     parser.add_argument('-fp', '--file_period', help='记录周期', type=int, default=7)
     parser.add_argument('-d', '--detail', help='记录进程列表到csv', action='store_false', default=False)
@@ -141,9 +144,12 @@ def argument_parser():
 if __name__ == "__main__":
     args = argument_parser()
     # print(args)  # 调试
-    # args.process = 'frp'
-    # args.interval_time = 2
+    # args.process = 'java'
+    # args.interval_time = 1
+    # args.port = '8083'
     if args.process:
-        process_monitor_info_record_to_file(args.process, args.file_period, args.interval_time, args.detail)
+        process_monitor_info_record_to_file(process_name=args.process, process_port=args.port,
+                                            file_period=args.file_period,
+                                            wait_time=args.interval_time, detail=args.detail)
     elif args.system:
         monitor_info_record_to_file(args.file_period, args.interval_time)
