@@ -8,12 +8,14 @@ from dateutil.relativedelta import relativedelta
 from x_mock.m_random import m_date
 
 
-def create_csv(header: list, file_name):
+def create_csv(header: list, file_name, log_info=None):
     if os.path.exists(file_name) is False:
         # 表头
         print(f'格式说明:{" ".join(header)}')
         with open(file_name, 'w', encoding='utf-8', newline='') as file_obj:
             writer = csv.writer(file_obj)
+            if log_info:
+                writer.writerow(log_info)
             writer.writerow(header)
         print(f'创建文件:{file_name}')
     else:

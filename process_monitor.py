@@ -149,12 +149,13 @@ def process_monitor_info_record_to_file(process_name, process_port=None, file_pe
     """
     raw_file_time = m_date.date()
     pr_name = process_name
-    print(f'监控的软件名称:{pr_name},端口:{process_port},记录文件创建周期:{file_period}天/次,间隔时间:{wait_time}秒/次')
+    start_info = f'--监控的软件名称:{pr_name},端口:{process_port},记录文件创建周期:{file_period}天/次,间隔时间:{wait_time}秒/次'
+    print(start_info)
     header = ['日期', '时间', 'cpu百分比/s', '已用内存/MB', '已用内存百分比', '进程数/个', '状态(1存活/0死亡)',
               '进程列表']
     header = handle_detail(detail, header)
     file_name = get_csv_name(raw_file_time, pr_name)
-    create_csv(header, file_name)
+    create_csv(header, file_name, [start_info])
     while True:
         if file_period is not None:
             file_name, raw_file_time = create_next_date_csv(file_name, file_period, header, pr_name, raw_file_time)
