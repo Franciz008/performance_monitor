@@ -18,7 +18,7 @@
 ### 注意事项
 
 如果进程是由管理员/最高权限启动,那么监控工具也需要用对应权限启动.
-Linux系统需要设置执行权限(chmod)
+
 
 ## 参数列表
 
@@ -108,25 +108,23 @@ monitx.exe -p java.exe -it 60 -fp 7
 
 ### 监控系统性能
 
-![image-20230301111624015](README.assets/image-20230301111624015.png)
-
 示例:监控系统性能
 
 ```shell
-./monitx
+monitx
 ```
 
-![image-20230320173028422](README.assets/image-20230320173028422.png)	
+![image-20230322185732686](README.assets/image-20230322185732686.png)		
 
 ### 监控包含指定名称的进程的性能
 
 示例:监控进程名包含`frp`的所有进程的性能信息,2s/次
 
 ```
-./monitx -p frp -it 2
+monitx -p frp -it 2
 ```
 
-![image-20230320172938449](README.assets/image-20230320172938449.png)	
+![image-20230322185805813](README.assets/image-20230322185805813.png)		
 
 
 
