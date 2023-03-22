@@ -42,7 +42,7 @@ Linux系统需要设置执行权限(chmod)
 例如每2s记录一次
 
 ```bash
-system_monitor.exe -it 2
+monitx.exe -it 2
 ```
 
 ![image-20230320142934944](README.assets/image-20230320142934944.png)	
@@ -68,7 +68,7 @@ cpu百分比:所有的cpu的平均利用率,此处和windows的任务管理器�
 例如监控windows上的`java.exe`
 
 ```bash
-system_monitor.exe -p java.exe
+monitx.exe -p java.exe
 ```
 
 ![image-20230320143716654](README.assets/image-20230320143716654.png)		
@@ -76,7 +76,7 @@ system_monitor.exe -p java.exe
 设置文件写入周期7天/次,监控周期60秒/次
 
 ```bash
-system_monitor.exe -p java.exe -it 60 -fp 7
+monitx.exe -p java.exe -it 60 -fp 7
 ```
 
 ![image-20230320143955476](README.assets/image-20230320143955476.png)	
@@ -113,7 +113,7 @@ system_monitor.exe -p java.exe -it 60 -fp 7
 示例:监控系统性能
 
 ```shell
-./linux_system_monitor
+./monitx
 ```
 
 ![image-20230320173028422](README.assets/image-20230320173028422.png)	
@@ -123,7 +123,7 @@ system_monitor.exe -p java.exe -it 60 -fp 7
 示例:监控进程名包含`frp`的所有进程的性能信息,2s/次
 
 ```
-./linux_system_monitor -p frp -it 2
+./monitx -p frp -it 2
 ```
 
 ![image-20230320172938449](README.assets/image-20230320172938449.png)	
@@ -134,6 +134,6 @@ system_monitor.exe -p java.exe -it 60 -fp 7
 
 因为支持命令行传参所以你可以自用的使用shell脚本或者bat脚本来完成指定的场景.
 
-例如: windows下`call system_monitor.exe -p java.exe`
+例如: windows下`call monitx.exe -p java.exe`
 
 ![image-20230320144220703](README.assets/image-20230320144220703.png)	

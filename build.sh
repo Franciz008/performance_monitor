@@ -1,1 +1,1 @@
-pyinstaller -n linux_system_monitor -F system_monitor.py
+pyinstaller -n monitx -F system_monitor.py
