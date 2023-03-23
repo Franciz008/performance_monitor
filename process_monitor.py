@@ -1,14 +1,15 @@
 # @author Franciz
 # @date 2023/3/16
-import asyncio
 import csv
+import multiprocessing
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 
 import psutil
 from x_mock.m_random import m_date
 
-from common import create_csv, create_next_date_csv, get_csv_name
+from common import create_csv, create_next_date_csv, get_csv_name, calculate_time
 
 
 class ProcessMonitorInfo:
@@ -28,6 +29,7 @@ class ProcessMonitorInfo:
     def get_all_info(self):
         return [self.cpu_percent, self.used_memory, self.used_memory_percent, self.process_size, self.status]
 
+    @calculate_time
     def get_pids(self):
         """
 
@@ -60,7 +62,7 @@ class ProcessMonitorInfo:
         self.proc_names = [i.name() for i in procs]
         return procs
 
-    async def get_used_memory(self):
+    def get_used_memory(self):
         """
 
         :return: 已用内存
@@ -72,7 +74,7 @@ class ProcessMonitorInfo:
         self.used_memory = float('%.2f' % sum(memory_list))
         return self.used_memory
 
-    async def get_used_memory_percent(self):
+    def get_used_memory_percent(self):
         """
 
         :return: 已用内存百分比
@@ -90,7 +92,7 @@ class ProcessMonitorInfo:
 
     cpu_percent_list = []
 
-    async def get_cpu_percent(self):
+    def get_cpu_percent(self):
         """
 
         :return: cpu的使用频率
@@ -105,28 +107,39 @@ class ProcessMonitorInfo:
             results = pool.map(__cpu_percent, self.process_list)
             for r in results:
                 self.cpu_percent_list.append(r)
-        # with multiprocessing.Pool() as pool:
+        # with multiprocessing.Pool() as pool:d
         #     results = pool.map(__cpu_percent, self.process_list)
         #     for r in results:
         #         self.cpu_percent_list.append(r)
         self.cpu_percent = float('%.2f' % sum(self.cpu_percent_list))
         return self.cpu_percent
 
-    async def get_io_counters(self):
+    def get_io_counters(self):
         io_counters_list = []
         for proc in self.process_list:
             io_counters = proc.io_counters()
             io_counters_list.append(io_counters)
             # todo
 
-    async def get_monitor_info(self):
-        proc_size = len(self.get_pids())
+    @calculate_time
+    def get_monitor_info(self):
+        proc_size = len(self.process_list)
         self.process_size = proc_size
         if proc_size > 0:
             self.status = 1
-            # pros = self.get_pids()
-            await asyncio.gather(self.get_used_memory(), self.get_used_memory_percent(),
-                                 self.get_cpu_percent())
+            with ThreadPoolExecutor(max_workers=3) as pool:
+                pool.submit(self.get_used_memory)
+                pool.submit(self.get_used_memory_percent)
+                pool.submit(self.get_cpu_percent)
+            # with multiprocessing.Pool(processes=2) as pool:
+            #     results = []
+            #     for func in [self.get_used_memory, self.get_used_memory_percent,self.get_cpu_percent]:
+            #         result = pool.apply_async(func)
+            #         results.append(result)
+            #     output = [r.get() for r in results]
+            # print(output)
+            # await asyncio.gather(self.get_used_memory(), self.get_used_memory_percent(),
+            #                      self.get_cpu_percent())
         else:
             self.status = 0
         return self.get_all_info()
@@ -155,6 +168,26 @@ def process_monitor_info_record_to_file(process_name, process_port=None, file_pe
     :param file_period:  记录文件创建周期/天
     :return:
     """
+
+    @calculate_time
+    def __run():
+        with open(file_name, 'a+', encoding='utf-8', newline='') as file_obj:
+            # 1:创建writer对象
+            writer = csv.writer(file_obj)
+            process_monitor_info = ProcessMonitorInfo(name=pr_name, port=process_port, interval_time=wait_time)
+            try:
+                result = process_monitor_info.get_monitor_info()
+            except Exception as e:
+                result = process_monitor_info.get_all_info()
+                print(e)
+            finally:
+                if process_monitor_info.status == 0:
+                    process_monitor_info.cpu_wait()
+            line = (m_date.date(), m_date.time(), *result, process_monitor_info.proc_names)
+            print(*line[:-1])
+            line = handle_detail(detail, line)
+            writer.writerow(line)
+
     raw_file_time = m_date.date()
     pr_name = process_name
     start_info = f'--监控的软件名称:{pr_name},端口:{process_port},记录文件创建周期:{file_period}天/次,间隔时间:{wait_time}秒/次'
@@ -168,21 +201,7 @@ def process_monitor_info_record_to_file(process_name, process_port=None, file_pe
         # start_time = time.perf_counter()
         if file_period is not None:
             file_name, raw_file_time = create_next_date_csv(file_name, file_period, header, pr_name, raw_file_time)
-        with open(file_name, 'a+', encoding='utf-8', newline='') as file_obj:
-            # 1:创建writer对象
-            writer = csv.writer(file_obj)
-            process_monitor_info = ProcessMonitorInfo(name=pr_name, port=process_port, interval_time=wait_time)
-            try:
-                result = asyncio.run(process_monitor_info.get_monitor_info())
-            except:
-                result = process_monitor_info.get_all_info()
-            finally:
-                if process_monitor_info.status == 0:
-                    process_monitor_info.cpu_wait()
-            line = (m_date.date(), m_date.time(), *result, process_monitor_info.proc_names)
-            print(*line[:-1])
-            line = handle_detail(detail, line)
-            writer.writerow(line)
+        __run()
         # end_time = time.perf_counter()
         # time_diff = end_time - start_time
         # print(f'耗时:{time_diff}')

@@ -152,8 +152,8 @@ def argument_parser():
 if __name__ == "__main__":
     args = argument_parser()
     # print(args)  # 调试
-    # args.process = 'SourceTree.exe'
-    # args.interval_time = 2
+    args.process = 'node.exe'
+    args.interval_time = 2
     # args.port = '8083'
     if args.process:
         process_monitor_info_record_to_file(process_name=args.process, process_port=args.port,
