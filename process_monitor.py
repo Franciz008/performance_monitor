@@ -19,7 +19,7 @@ class ProcessMonitorInfo:
     process_size = 0
     proc_names = []  # 进程名称的列表
 
-    def __init__(self, name, port=None, interval_time=2):
+    def __init__(self, name, port=None, interval_time=5):
         self.name = name
         self.port = port
         self.interval_time = interval_time
@@ -84,25 +84,33 @@ class ProcessMonitorInfo:
         self.used_memory_percent = float('%.2f' % sum(memory_percent_list))
         return self.used_memory_percent
 
+    def cpu_wait(self):
+        if self.interval_time > 1.5:
+            time.sleep(self.interval_time - 1.5)
+
+    cpu_percent_list = []
+
     async def get_cpu_percent(self):
         """
 
         :return: cpu的使用频率
         """
-        cpu_percent_list = []
 
         def __cpu_percent(process):
             cpu_percent = process.cpu_percent(1)
-            if self.interval_time > 1:
-                time.sleep(self.interval_time - 1)
+            self.cpu_wait()
             return cpu_percent
 
         with ThreadPoolExecutor(max_workers=len(self.process_list)) as pool:
             results = pool.map(__cpu_percent, self.process_list)
             for r in results:
-                cpu_percent_list.append(r)
-        self.cpu_percent = float('%.2f' % sum(cpu_percent_list))
-        return
+                self.cpu_percent_list.append(r)
+        # with multiprocessing.Pool() as pool:
+        #     results = pool.map(__cpu_percent, self.process_list)
+        #     for r in results:
+        #         self.cpu_percent_list.append(r)
+        self.cpu_percent = float('%.2f' % sum(self.cpu_percent_list))
+        return self.cpu_percent
 
     async def get_io_counters(self):
         io_counters_list = []
@@ -116,7 +124,7 @@ class ProcessMonitorInfo:
         self.process_size = proc_size
         if proc_size > 0:
             self.status = 1
-            pros = self.get_pids()
+            # pros = self.get_pids()
             await asyncio.gather(self.get_used_memory(), self.get_used_memory_percent(),
                                  self.get_cpu_percent())
         else:
@@ -137,7 +145,7 @@ class ProcessMonitorInfo:
         # print(p.memory_full_info().uss / 1024 / 1024, 'MB')
 
 
-def process_monitor_info_record_to_file(process_name, process_port=None, file_period=1, wait_time=2, detail=False):
+def process_monitor_info_record_to_file(process_name, process_port=None, file_period=1, wait_time=5, detail=False):
     """
 
     :param process_port: 进程的端口
@@ -157,6 +165,7 @@ def process_monitor_info_record_to_file(process_name, process_port=None, file_pe
     file_name = get_csv_name(raw_file_time, pr_name)
     create_csv(header, file_name, [start_info])
     while True:
+        # start_time = time.perf_counter()
         if file_period is not None:
             file_name, raw_file_time = create_next_date_csv(file_name, file_period, header, pr_name, raw_file_time)
         with open(file_name, 'a+', encoding='utf-8', newline='') as file_obj:
@@ -169,11 +178,14 @@ def process_monitor_info_record_to_file(process_name, process_port=None, file_pe
                 result = process_monitor_info.get_all_info()
             finally:
                 if process_monitor_info.status == 0:
-                    time.sleep(process_monitor_info.interval_time)
+                    process_monitor_info.cpu_wait()
             line = (m_date.date(), m_date.time(), *result, process_monitor_info.proc_names)
             print(*line[:-1])
             line = handle_detail(detail, line)
             writer.writerow(line)
+        # end_time = time.perf_counter()
+        # time_diff = end_time - start_time
+        # print(f'耗时:{time_diff}')
 
 
 def handle_detail(detail, line):
