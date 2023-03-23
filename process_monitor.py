@@ -120,11 +120,10 @@ class ProcessMonitorInfo:
             # todo
 
     async def get_monitor_info(self):
-        proc_size = len(self.get_pids())
+        proc_size = len(self.process_list)
         self.process_size = proc_size
         if proc_size > 0:
             self.status = 1
-            # pros = self.get_pids()
             await asyncio.gather(self.get_used_memory(), self.get_used_memory_percent(),
                                  self.get_cpu_percent())
         else:

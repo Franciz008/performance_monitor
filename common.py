@@ -2,10 +2,22 @@
 # @date 2023/3/16 19:16
 import csv
 import os
+import time
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 from x_mock.m_random import m_date
+
+
+def calculate_time(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        print(f"Function {func.__name__} took {end_time - start_time:.8f} seconds to execute")
+        return result
+
+    return wrapper
 
 
 def create_csv(header: list, file_name, log_info=None):
