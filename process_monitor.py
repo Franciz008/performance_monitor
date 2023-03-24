@@ -34,29 +34,32 @@ class ProcessMonitorInfo:
         :return: 根据程序的名称如:Thunder.exe 返回对应程序活动的进程列表
         """
 
-        def add():
-            procs.append(proc)
-            children_pids = proc.children()
+        def add(proc1, procs1):
+            procs1.append(proc1)
+            children_pids = proc1.children()
             if len(children_pids) > 0:
-                for i in proc.children():
-                    procs.append(i)
+                for i in proc1.children():
+                    procs1.append(i)
 
         name = self.name
         procs = []
-        for proc in psutil.process_iter():
-            if name in proc.name() and proc.status() in (psutil.STATUS_RUNNING, psutil.STATUS_SLEEPING):
-                # 获取名称对应且是运行中的改程序的所有进程(含子进程)
-                # pid = proc.pid
-                # cmdline = proc.as_dict().get('cmdline')
-                # print(json.dumps(proc.as_dict(), indent=2))
-                proc_environ = proc.as_dict().get('environ')
-                proc_port = None if proc_environ is None else proc_environ.get('PORT')
-                if self.port is not None and proc_port and self.port == proc_port:
-                    # 根据名称和端口号确定监控的进程
-                    add()
-                elif self.port is None:
-                    # 根据名称确定监控的进程
-                    add()
+        for proc in psutil.process_iter(attrs=['pid', 'name', 'status', 'environ']):
+            try:
+                if name in proc.name() and proc.status() in (psutil.STATUS_RUNNING, psutil.STATUS_SLEEPING):
+                    # 获取名称对应且是运行中的改程序的所有进程(含子进程)
+                    # pid = proc.pid
+                    # cmdline = proc.as_dict().get('cmdline')
+                    # print(json.dumps(proc.as_dict(), indent=2))
+                    proc_environ = proc.environ()
+                    proc_port = None if proc_environ is None else proc_environ.get('PORT')
+                    if self.port is not None and proc_port and self.port == proc_port:
+                        # 根据名称和端口号确定监控的进程
+                        add(proc, procs)
+                    elif self.port is None:
+                        # 根据名称确定监控的进程
+                        add(proc, procs)
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                pass
         self.proc_names = [i.name() for i in procs]
         return procs
 
