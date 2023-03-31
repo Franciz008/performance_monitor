@@ -15,6 +15,8 @@ This is a command-line tool used to monitor the processes (including subprocesse
 - `-fp, --file_period`: Specifies the data period to be recorded, default is 7 days.
 - `-d, --detail`: Specifies whether to record the process list to a CSV file, default is not recorded.
 
+The options "-s" and "-p" are mutually exclusive and cannot be used simultaneously.
+
 ## Usage
 
 ### Monitor the process of the software
