@@ -1,0 +1,1 @@
+git checkout . && git clean -xdf && git pull
