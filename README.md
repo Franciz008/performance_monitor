@@ -17,22 +17,49 @@ This is a command-line tool used to monitor the processes (including subprocesse
 
 The options "-s" and "-p" are mutually exclusive and cannot be used simultaneously.
 
-## Usage
+## Windows Usage
 
 ### Monitor the process of the software
 
 ```bash
-python process_monitor.py -p <software_name> -port <port_number>
+monitx.exe -p <software_name> -port <port_number>
 ```
 
 ### Record system performance information
 
 ```bash
-python process_monitor.py -s
+monitx.exe -s
 ```
 
 ### Monitor the process of the software and record system performance information at the same time
 
 ```bash
-python process_monitor.py -p <software_name> -port <port_number> -it <interval_time> -fp <file_period> -d
+monitx.exe -p <software_name> -port <port_number> -it <interval_time> -fp <file_period> -d
 ```
+
+## Linux Usage
+
+### Monitor the process of the software
+
+```bash
+monitx -p <software_name> -port <port_number>
+```
+
+### Record system performance information
+
+```bash
+monitx -s
+```
+
+### Monitor the process of the software and record system performance information at the same time
+
+```bash
+monitx -p <software_name> -port <port_number> -it <interval_time> -fp <file_period> -d
+```
+
+**Monitor the performance information of all processes that contain the process name "frp" every 2 seconds.**
+
+```
+monitx -p frp -it 2
+```
+
