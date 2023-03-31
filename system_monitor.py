@@ -1,10 +1,8 @@
+import argparse
 import asyncio
 import csv
-import os
-import sys
 import time
 
-import argparse
 import psutil
 from x_mock.m_random import m_date
 
@@ -138,22 +136,24 @@ def monitor_info_record_to_file(file_period=1, wait_time=10):
 
 def argument_parser():
     parser = argparse.ArgumentParser(description="根据软件名称监控指定软件的进程(含子进程)/记录系统性能信息(默认)")
-    # 系统监控
-    parser.add_argument('-s', '--system', help='记录系统性能信息,不可与-p同时使用', action='store_true', default=True)
-    # 进程相关
-    parser.add_argument('-p', '--process', help='软件名称')
+
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-s', '--system', help='记录系统性能信息', action='store_true', default=True)
+    group.add_argument('-p', '--process', help='软件名称')
+
     parser.add_argument('-port', help='软件对应的端口号', type=str, default=None)
     parser.add_argument('-it', '--interval_time', help='间隔时间', type=int, default=10)
     parser.add_argument('-fp', '--file_period', help='记录周期', type=int, default=7)
     parser.add_argument('-d', '--detail', help='记录进程列表到csv', action='store_false', default=False)
+
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = argument_parser()
     # print(args)  # 调试
-    # args.process = 'SourceTree.exe'
-    # args.interval_time = 2
+    # args.process = 'java.exe'
+    # args.interval_time = 3
     # args.port = '8083'
     if args.process:
         process_monitor_info_record_to_file(process_name=args.process, process_port=args.port,

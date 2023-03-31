@@ -17,13 +17,14 @@ class ProcessMonitorInfo:
     used_memory = 0  # 已用内存/MB
     status = 0
     process_size = 0
-    proc_names = []  # 进程名称的列表
 
     def __init__(self, name, port=None, interval_time=5):
         self.name = name
         self.port = port
         self.interval_time = interval_time
         self.process_list = self.get_pids()
+        self.proc_names = []  # 进程名称的列表
+        self.cpu_percent_list = []  # 进程名称的CPU使用率的列表
 
     def get_all_info(self):
         return [self.cpu_percent, self.used_memory, self.used_memory_percent, self.process_size, self.status]
@@ -88,8 +89,8 @@ class ProcessMonitorInfo:
         return self.used_memory_percent
 
     def cpu_wait(self):
-        if self.interval_time > 1.5:
-            time.sleep(self.interval_time - 1.5)
+        if self.interval_time > 1:
+            time.sleep(self.interval_time - 1)
 
     cpu_percent_list = []
 
@@ -100,7 +101,7 @@ class ProcessMonitorInfo:
         """
 
         def __cpu_percent(process):
-            cpu_percent = process.cpu_percent(1)
+            cpu_percent = min(process.cpu_percent(1), 100.0)
             self.cpu_wait()
             return cpu_percent
 
@@ -108,11 +109,7 @@ class ProcessMonitorInfo:
             results = pool.map(__cpu_percent, self.process_list)
             for r in results:
                 self.cpu_percent_list.append(r)
-        # with multiprocessing.Pool() as pool:
-        #     results = pool.map(__cpu_percent, self.process_list)
-        #     for r in results:
-        #         self.cpu_percent_list.append(r)
-        self.cpu_percent = float('%.2f' % sum(self.cpu_percent_list))
+        self.cpu_percent = min(float('%.2f' % sum(self.cpu_percent_list)), 100.0)
         return self.cpu_percent
 
     async def get_io_counters(self):
@@ -176,7 +173,8 @@ def process_monitor_info_record_to_file(process_name, process_port=None, file_pe
             process_monitor_info = ProcessMonitorInfo(name=pr_name, port=process_port, interval_time=wait_time)
             try:
                 result = asyncio.run(process_monitor_info.get_monitor_info())
-            except:
+            except Exception as e:
+                print(e)
                 result = process_monitor_info.get_all_info()
             finally:
                 if process_monitor_info.status == 0:
